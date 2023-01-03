@@ -1,0 +1,3 @@
+##IGNORE .next build files
+.next
+/node_modules
