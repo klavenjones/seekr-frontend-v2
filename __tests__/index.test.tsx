@@ -9,6 +9,6 @@ describe('Home', () => {
     const heading = screen.getByRole('heading');
 
     expect(heading).toBeInTheDocument();
-    expect(heading).toHaveTextContent('Welcome to Seekr');
+    expect(heading).toHaveTextContent('Seekr');
   });
 });
