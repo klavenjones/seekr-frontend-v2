@@ -2,6 +2,7 @@ import { Controller, useForm } from 'react-hook-form';
 import Select from 'react-select';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { capitalizeWords } from '@/utils/capitalizeWords';
 
 interface FormValues {
   title: string;
@@ -247,8 +248,8 @@ export function EditJobForm({ submitJob, job }: JobFormProps) {
       description: job?.description,
       location: job?.location,
       salary: job?.salary,
-      // @ts-ignore
-      status: { value: job?.status, label: job?.status },
+      //@ts-ignore
+      status: { value: job?.status, label: capitalizeWords(job?.status) },
     },
   });
 

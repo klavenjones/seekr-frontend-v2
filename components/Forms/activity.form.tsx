@@ -3,6 +3,7 @@ import Select from 'react-select';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useState } from 'react';
+import { capitalizeWords } from '@/utils/capitalizeWords';
 
 interface FormValues {
   name: string;
@@ -339,7 +340,7 @@ export function EditActivityForm({ submitActivity, activity }: ActivityFormProps
       end: activity?.end,
       done: activity?.done,
       //@ts-ignore
-      type: { value: activity?.type, label: activity?.type },
+      type: { value: activity?.type, label: capitalizeWords(activity?.type) },
       note: activity?.note,
     },
   });

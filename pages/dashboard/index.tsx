@@ -1,10 +1,8 @@
 import { useState } from 'react';
-import { useAuth } from '@clerk/nextjs';
-import { getActivities, getJobs, editActivity } from '@/utils/supabaseRequests';
+import { getActivities, getJobs, getContacts } from '@/utils/supabaseRequests';
 import { buildClerkProps, clerkClient, getAuth } from '@clerk/nextjs/server';
 import { User } from '@clerk/nextjs/dist/api';
 import { Navigation } from '@/components/Layout';
-import { ActivityForm } from '@/components/Forms/activity.form';
 
 const navigation = [
   { name: 'Home', href: '/', current: false },
@@ -20,16 +18,17 @@ export const getServerSideProps = async ({ req }) => {
 
   const allJobs = token ? await getJobs({ userId, token }) : null;
   const allActivities = token ? await getActivities({ userId, token }) : null;
+  const allContacts = token ? await getContacts({ userId, token }) : null;
 
   if (user) {
-    return { props: { ...buildClerkProps(req, { user }), allJobs, allActivities } };
+    return { props: { ...buildClerkProps(req, { user }), allJobs, allActivities, allContacts } };
   }
 };
 
-export default function DashboardHome({ allJobs, allActivities }) {
-  const { userId, getToken } = useAuth();
+export default function DashboardHome({ allJobs, allActivities, allContacts }) {
   const [jobs] = useState(allJobs);
-  const [activities, setActivities] = useState(allActivities);
+  const [activities] = useState(allActivities);
+  const [contacts] = useState(allContacts);
 
   // const handleAddJob = async jobData => {
   //   const token = await getToken({ template: 'supabase' });
@@ -55,39 +54,64 @@ export default function DashboardHome({ allJobs, allActivities }) {
   //   setActivities([...activities, activityData]);
   // };
 
-  const handleEditActivity = async activityData => {
-    const token = await getToken({ template: 'supabase' });
-    const currentActivityState = activities;
-    token ? await editActivity({ token, userId, activityData, activityId: 6 }) : null;
-    //For Optimistic Update to the UI we need to replace the object being updated for now
-    const oldIndex = currentActivityState.findIndex(el => el.id === 6);
-    currentActivityState[oldIndex] = { id: 6, ...activityData };
-    setActivities([...currentActivityState]);
-  };
+  // const handleEditActivity = async activityData => {
+  //   const token = await getToken({ template: 'supabase' });
+  //   const currentActivityState = activities;
+  //   token ? await editActivity({ token, userId, activityData, activityId: 6 }) : null;
+  //   //For Optimistic Update to the UI we need to replace the object being updated for now
+  //   const oldIndex = currentActivityState.findIndex(el => el.id === 6);
+  //   currentActivityState[oldIndex] = { id: 6, ...activityData };
+  //   setActivities([...currentActivityState]);
+  // };
+
+  // const handleAddContact = async contactData => {
+  //   const token = await getToken({ template: 'supabase' });
+  //   console.log(token);
+  //   token ? await addContact({ token, userId, contactData }) : null;
+  //   setContacts([...contacts, contactData]);
+  // };
+
+  // const handleEditContact = async contactData => {
+  //   const token = await getToken({ template: 'supabase' });
+  //   const currentContactState = contacts;
+  //   token ? await editContact({ token, userId, contactData, contactId: 3 }) : null;
+  //   //For Optimistic Update to the UI we need to replace the object being updated for now
+  //   const oldIndex = currentContactState.findIndex(el => el.id === 3);
+  //   currentContactState[oldIndex] = { id: 3, ...contactData };
+  //   setContacts([...currentContactState]);
+  // };
 
   return (
     <Navigation navigation={navigation} pageName="Dashboard">
       <p>
         This will be the dashboard for your Seekr Application, this will contain 5 recent jobs, contacts, and activities
       </p>
-      {/* Add Job Form */}
-      <ActivityForm type="Edit" submitActivity={handleEditActivity} activity={activities[activities.length - 1]} />
-      {/* End of Add Job Form */}
-      <div className="h-96 mt-10 grid grid-cols-2 border">
+      <div className="h-96 mt-10 grid sm:grid-cols-2 gap-3">
         {/* Job List */}
-        <div className="border">
+        <div className="border-2 p-3">
+          <h1 className="text-3xl mb-4 font-bold">Jobs</h1>
           {jobs &&
             jobs.map(job => (
-              <p key={job?.id}>
+              <p className="mb-1 font-mono" key={job?.id}>
                 {job.title} - {job?.company}
               </p>
             ))}
         </div>
-        <div className="border">
+        <div className="border-2 p-3">
+          <h1 className="text-3xl mb-4 font-bold">Activities</h1>
           {activities &&
             activities.map(activity => (
-              <p key={activity?.id}>
+              <p className="mb-1 font-mono" key={activity?.id}>
                 {activity.name} - {activity?.company}
+              </p>
+            ))}
+        </div>
+        <div className="border-2 p-3">
+          <h1 className="text-3xl mb-4 font-bold">Contacts</h1>
+          {contacts &&
+            contacts.map(contact => (
+              <p className="mb-1 font-mono" key={contact?.id}>
+                {contact.name} - {contact?.company}
               </p>
             ))}
         </div>

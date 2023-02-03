@@ -21,6 +21,23 @@ interface AddJob {
     location?: string;
   };
 }
+interface AddContact {
+  userId: string | null | undefined;
+  token: string;
+  contactData: {
+    name: string;
+    company?: string;
+    title?: string;
+    email?: string;
+    phone?: string;
+    location?: string;
+    twitter?: string;
+    linkedin?: string;
+    github?: string;
+    personalWebsite?: string;
+    note?: string;
+  };
+}
 
 interface AddActivity {
   userId: string | null | undefined;
@@ -43,6 +60,10 @@ interface EditJob extends AddJob {
 
 interface EditActivity extends AddActivity {
   activityId: number;
+}
+
+interface EditContact extends AddContact {
+  contactId: number;
 }
 
 export const getJobs = async ({ userId, token }: UserCredentials) => {
@@ -137,6 +158,60 @@ export const editActivity = async ({ userId, token, activityData, activityId }: 
     type: activityData?.type?.value,
     note: activityData?.note,
     done: activityData?.done,
+  });
+
+  if (error) {
+    console.log(error);
+  }
+
+  return data;
+};
+
+export const getContacts = async ({ userId, token }: UserCredentials) => {
+  const supabase = await supabaseClient(token);
+  const { data: contacts } = await supabase.from('Contacts').select('*').eq('user_id', userId);
+  return contacts;
+};
+
+export const addContact = async ({ userId, token, contactData }: AddContact) => {
+  const supabase = await supabaseClient(token!);
+  const { data, error } = await supabase.from('Contacts').insert({
+    user_id: userId,
+    name: contactData?.name,
+    company: contactData?.company,
+    title: contactData?.title,
+    email: contactData?.email,
+    phone: contactData?.phone,
+    location: contactData?.location,
+    twitter: contactData?.twitter,
+    linkedin: contactData?.linkedin,
+    github: contactData?.github,
+    personal_website: contactData?.personalWebsite,
+    note: contactData?.note,
+  });
+
+  if (error) {
+    console.log(error);
+  }
+
+  return data;
+};
+
+export const editContact = async ({ userId, token, contactData, contactId }: EditContact) => {
+  const supabase = await supabaseClient(token!);
+  const { data, error } = await supabase.from('Contacts').upsert({
+    id: contactId,
+    name: contactData?.name,
+    company: contactData?.company,
+    title: contactData?.title,
+    email: contactData?.email,
+    phone: contactData?.phone,
+    location: contactData?.location,
+    twitter: contactData?.twitter,
+    linkedin: contactData?.linkedin,
+    github: contactData?.github,
+    personal_website: contactData?.personalWebsite,
+    note: contactData?.note,
   });
 
   if (error) {
